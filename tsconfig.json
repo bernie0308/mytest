@@ -1,0 +1,25 @@
+// 指定了用来编译这个项目的根文件和编译选项
+// 配置参考https://www.tslang.cn/docs/handbook/tsconfig-json.html
+{
+  "compilerOptions": {
+      "target": "esnext",
+      "module": "esnext",
+      "strict": true, // js/ts 混用时设为false
+      "jsx": "preserve",
+      "importHelpers": true,
+      "moduleResolution": "node",
+      "experimentalDecorators": true,
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "sourceMap": true,
+      "noImplicitThis": true, // js/ts 混用时设为false
+      "baseUrl": ".",
+      "types": ["webpack-env"],
+      "paths": {
+          "@/*": ["src/*"]
+      },
+      "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "src", "src/typings/*.d.ts"],
+  "exclude": ["node_modules"]
+}

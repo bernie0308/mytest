@@ -1,0 +1,39 @@
+.table-mix-area-1::v-deep {
+  .table-mix-row {
+    &.first-row {
+      font-size: 14px;
+    }
+    &.second-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 12px;
+      .left {
+        min-width: 70px;
+      }
+      .right {
+        margin-left: 10px;
+      }
+    }
+  }
+}
+
+.table-mix-area-2::v-deep {
+  .table-mix-row {
+    display: flex;
+    align-items: center;
+    .label {
+      font-size: 13px;
+      color: #888;
+      height: 20px;
+    }
+    .value {
+      font-size: 14px;
+      height: 20px;
+      line-height: 18px;
+      overflow: hidden;
+      text-overflow:ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
