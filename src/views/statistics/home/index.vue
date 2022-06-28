@@ -1,9 +1,9 @@
 <template>
   <div class="home-container">
-    <!-- <div class="title">
+    <div class="title">
       <h4>Genki Forest Referral Program</h4>
       <a-button @click="handleEdit">编辑</a-button>
-    </div> -->
+    </div>
     <a-modal v-model:visible="visible" title="Edit Referral Program" :bodyStyle="{ maxHeight: '600px', overflow: 'auto' }" @ok="handleOk">
       <a-form
         :model="formState"
@@ -77,8 +77,8 @@
       <a-dropdown>
       <template #overlay>
         <a-menu @click="handleMenuClick">
-          <!-- <a-menu-item key="1">Export Referrers</a-menu-item>
-          <a-menu-item key="2">Export Friends</a-menu-item> -->
+          <a-menu-item key="1">Export Referrers</a-menu-item>
+          <a-menu-item key="2">Export Friends</a-menu-item>
           <a-menu-item key="3">Export Orders</a-menu-item>
         </a-menu>
       </template>
