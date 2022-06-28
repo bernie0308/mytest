@@ -1,7 +1,7 @@
 import qs from 'qs'
 import { useRoute } from 'vue-router'
 const route = useRoute()
-const BASE_URL = 'https://shopify-manage.yuanqisenlin.com/api/admin/'
+const BASE_URL = 'https://shopify-manage.yuanqisenlin-test.com/api/admin/'
 // const BASE_URL = window.location.hostname + '/api/admin/'
 // 校验文件格式
 export const fileTypeValidate = (fileName: string, accept: Array<string>) => {
