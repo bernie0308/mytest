@@ -186,7 +186,7 @@ export default defineComponent({
       const { friendRewardType, friendRewardValue, friendRewardExpiryInDays, referrerRewardType, referrerRewardValue, referrerRewardExpiryInDays} = formState
       const friend = Object.assign({}, { rewardType: friendRewardType }, { rewardValue: friendRewardValue.toString() }, { rewardExpiryInDays: friendRewardExpiryInDays})
       const referrer = Object.assign({}, { rewardType: referrerRewardType }, { rewardValue: referrerRewardValue.toString() }, { rewardExpiryInDays: referrerRewardExpiryInDays})
-      handleEditMerchant('us', { friend, referrer})
+      handleEditMerchant(state.user.store, { friend, referrer })
     }
     const handleMenuClick: MenuProps['onClick'] = async e => {
       const valid = await formDateRef.value.validateFields()
@@ -228,7 +228,7 @@ export default defineComponent({
     }
     // 回显推荐人配置
     const handleGetMerchant = () => {
-      return getMerchant('us').then((res:any) => {
+      return getMerchant(state.user.store).then((res:any) => {
         const settings = res.reward_settings
         formState.friendRewardType = settings.friend.rewardType
         formState.friendRewardValue = settings.friend.rewardValue

@@ -28,6 +28,12 @@ const routes = [
         path: '/statistics/home',
         component: () => import('@/views/statistics/home/index.vue'),
         title: '首页',
+        icon: 'bar-chart-outlined' 
+      },
+      {
+        path: '/statistics/config',
+        component: () => import('@/views/statistics/config/index.vue'),
+        title: 'cross-sell 配置',
         icon: 'bar-chart-outlined'
       }
     ]
