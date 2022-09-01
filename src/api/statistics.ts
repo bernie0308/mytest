@@ -78,7 +78,7 @@ export function getProductList(store: string) {
   // 删除商品
   export function ProductDelDisableProductX(store: string, data: Record<string, any> = {}) {
     return request({
-      url: `/admin/cross-sell/{store}/disable-x-product`,
+      url: `/admin/cross-sell/${store}/disable-x-product`,
       method: 'POST',
       data
     })

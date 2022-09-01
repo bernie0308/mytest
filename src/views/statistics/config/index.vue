@@ -51,9 +51,9 @@
                     <span>
                         <a> {{ record.name }}</a>
                         <!-- <a-divider type="vertical" /> -->
-                        <a @click="emit">编辑</a>
+                        <a @click="emitCommodityName(record)">编辑</a>
                         <a-divider type="vertical" />
-                        <a class="ant-dropdown-link" @click="out(record.product_id)"> 删除 </a>
+                        <a class="ant-dropdown-link" @click="out(record.id)"> 删除 </a>
                     </span>
                 </template>
             </template>
@@ -73,22 +73,27 @@
             <!-- 编辑弹出框里面的表单 -->
             <div class="box_form">
                 <a-form
-                    :model="emitFormData"
+                    :model="emitCommodityList"
                     name="basic"
                     :label-col="{ span: 5 }"
                     :wrapper-col="{ span: 16 }"
                     autocomplete="off"
                     @finish="onFinish"
                     @finishFailed="onFinishFailed"
-                    ref="myFormRefs"
                 >
-                    <!-- 素材名 -->
-                    <a-form-item
-                        label="素材名"
-                        name="username"
-                        :rules="[{ required: true, message: '请输入账号' }]"
-                    >
-                        <a-input v-model:value="emitFormData.username" />
+                    <!-- 产品名称 -->
+                    <a-form-item label="产品名称">
+                        <a-input v-model:value="emitCommodityList.title" />
+                    </a-form-item>
+
+                    <!-- ShopifyX产品ID -->
+                    <a-form-item label="产品ID">
+                        <a-input v-model:value="emitCommodityList.product_id" />
+                    </a-form-item>
+
+                    <!-- 折扣类型 -->
+                    <a-form-item label="折扣类型">
+                        <a-input v-model:value="emitCommodityList.product_id" />
                     </a-form-item>
 
                     <!-- 素材名 -->
@@ -221,7 +226,9 @@ export default defineComponent({
         // 测试
         const tagId = ref([])
         // 删除的数据
-        const x_product_id = ref<string>("")
+        const x_product_id = ref<number>(0)
+        // 编辑的产品名称
+        const emitCommodityList = ref({})
         // 新增 弹出框里面的表单
         const addFormData = reactive<FormState>({
             product_id: null,
@@ -258,7 +265,6 @@ export default defineComponent({
                 console.log(productDataX.value, "addFormData-----")
             })
         }
-        console.log(123)
         getProductAdd()
 
         // 新增按钮的 添加数据
@@ -268,14 +274,15 @@ export default defineComponent({
                 // console.log(getProductListX.value, "-----")
             })
         }
-        console.log(123)
         getProductData()
 
         // 调用删除的接口
         const ProductDel = () => {
-            ProductDelDisableProductX("umys", productId.value).then((res: AxiosResponse<any>) => {
-                console.log(res, "-----")
-            })
+            ProductDelDisableProductX("umys", { cs_x_product_id: x_product_id.value }).then(
+                (res: AxiosResponse<any>) => {
+                    console.log(res, "-----")
+                }
+            )
         }
 
         // 删除的确定按钮
@@ -290,14 +297,11 @@ export default defineComponent({
 
         // 头部的新增按钮
         const add = () => {
-            console.log(x_product_id.value, 123)
-
             isShowAdd.value = true
         }
 
         // 新增按钮的提交
         const addSubmit = () => {
-            console.log(addFormData, "测试---测试---测试---")
             getProductAddDiscountX("umys", addFormData)
                 .then((res) => {
                     isShowAdd.value = false
@@ -336,24 +340,24 @@ export default defineComponent({
         }
         // ---------------
 
-        // 失效弹窗的确定按钮
+        // 删除弹窗的确定按钮
         const OutSubmit = () => {
-            console.log("提交")
             isShowOut.value = false
         }
 
-        // 失效按钮弹出框
+        // 删除按钮弹出框
         const out = (productId: Number) => {
-            const x_product_id = productId
-            console.log(x_product_id, "888888888888888888888888")
+            x_product_id.value = productId
+            console.log(x_product_id.value, "888888888888888888888888")
 
             isShowOut.value = true
         }
 
         // 编辑按钮弹出框
-        const emit = () => {
+        const emitCommodityName = (record: object) => {
+            emitCommodityList.value = record
+            console.log(emitCommodityList.value, "record--record--record--record")
             isShowEmit.value = true
-            console.log("编辑")
         }
 
         // 编辑表单的取消按钮
@@ -451,13 +455,14 @@ export default defineComponent({
             ProductDel,
             delProduct,
             x_product_id,
+            emitCommodityName,
+            emitCommodityList,
             shoppingReduce,
             shoppingAdd,
             add,
             cancel,
             cancelOut,
             out,
-            emit,
             OutSubmit,
             onFinish,
             onFinishFailed,
