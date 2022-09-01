@@ -93,16 +93,11 @@
 
                     <!-- 折扣类型 -->
                     <a-form-item label="折扣类型">
-                        <a-input v-model:value="emitCommodityList.product_id" />
-                    </a-form-item>
-
-                    <!-- 素材名 -->
-                    <a-form-item
-                        label="西部大嫖客"
-                        name="password"
-                        :rules="[{ required: true, message: '请输入密码' }]"
-                    >
-                        <a-input v-model:value="emitFormData.password" />
+                        <a-select
+                            class="price_list"
+                            v-model:value="emitCommodityList.discount_type"
+                            :options="valueData"
+                        />
                     </a-form-item>
 
                     <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
