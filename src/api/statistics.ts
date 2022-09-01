@@ -49,3 +49,39 @@ export function getMerchant(store: string) {
     method: 'get'
   })
 }
+
+// 管理端-CrossSell折扣产品列表
+export function getProductList(store: string) {
+  return request({
+    url: `/admin/cross-sell/${store}/get-x-product-list`,
+    method: 'get'
+  })
+}
+
+// 管理端-Shopify产品列表 (头部新增的按钮 )
+  export function getProductAddList(store: string) {
+    return request({
+      url: `/admin/cross-sell/${store}/get-product-list`,
+      method: 'get'
+    })
+  }
+
+  // 管理端-设置X产品折扣商品 (新增的接口) 
+   export function getProductAddDiscountX(store: string, data: Record<string, any> = {}) {
+    return request({
+      url: `/admin/cross-sell/${store}/set-x-discount-product`,
+      method: 'POST',
+      data
+    })
+  }
+
+  // 删除商品
+  export function ProductDelDisableProductX(store: string, data: Record<string, any> = {}) {
+    return request({
+      url: `/admin/cross-sell/{store}/disable-x-product`,
+      method: 'POST',
+      data
+    })
+  }
+
+

@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import { resolve } from 'path'
 import vue from '@vitejs/plugin-vue'
 
-function pathResolve(dir) {
+function pathResolve (dir) {
   return resolve(__dirname, '.', dir)
 }
 
@@ -10,21 +10,22 @@ export default ({ mode }) => {
   const IS_DEV = mode === 'development'
   const proxy = {
     '/api': {
-      target: 'https://shopify-manage-test.yuanqisenlin.com', // 测试环境
+      // target: 'https://shopify-manage-test.yuanqisenlin.com', // 测试环境
       // targen: '192.168.224.93',
+      target: 'http://192.168.230.16:8086', // ace-钟富成 的本地地址
       changeOrigin: true
-    },
+    }
   }
   return defineConfig({
     base: '/',
-    plugins:[vue()],
+    plugins: [vue()],
     resolve: {
       alias: {
-        '@': pathResolve('src'),
+        '@': pathResolve('src')
       }
     },
     optimizeDeps: {
-      include: ['axios'],
+      include: ['axios']
     },
     build: {
       target: 'modules',
