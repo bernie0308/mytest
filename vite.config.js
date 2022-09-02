@@ -10,9 +10,9 @@ export default ({ mode }) => {
   const IS_DEV = mode === 'development'
   const proxy = {
     '/api': {
-      // target: 'https://shopify-manage-test.yuanqisenlin.com', // 测试环境
+      target: 'https://shopify-manage-test.yuanqisenlin.com', // 测试环境
       // targen: '192.168.224.93',
-      target: 'http://192.168.230.16:8086', // ace-钟富成 的本地地址
+      // target: 'http://192.168.230.16:8086', // ace-钟富成 的本地地址
       changeOrigin: true
     }
   }

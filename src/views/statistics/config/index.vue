@@ -1,6 +1,5 @@
 <template>
     <!-- cross sell配置 -->
-    <div>cross sell配置</div>
 
     <!-- 新增按钮 -->
     <div class="box_add">
@@ -102,7 +101,7 @@
 
                     <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
                         <a-button style="margin-left: 10px" @click="cancelOut">取消</a-button>
-                        <a-button type="primary" html-type="submit">确定</a-button>
+                        <a-button type="primary"  html-type="submit">确定</a-button>
                     </a-form-item>
                 </a-form>
             </div>
@@ -110,11 +109,11 @@
     </div>
 
     <!-- 新增的弹出层 -->
-    <div>
+    <div :spinning="spinning">
         <a-modal
             v-model:visible="isShowAdd"
             width="1000px"
-            title="温馨提示"
+            :title="!isEdit ? '新增' : '编辑'"
             @cancel="cancel"
             @ok="addSubmit"
         >
@@ -123,6 +122,7 @@
                 <a-form
                     :model="addFormData"
                     name="basic"
+                    ref="formRef"
                     :label-col="{ span: 5 }"
                     :wrapper-col="{ span: 16 }"
                     autocomplete="off"
@@ -130,9 +130,10 @@
                     @finishFailed="onFinishFailed"
                 >
                     <!-- 产品X -->
-                    <a-form-item name="area" label="产品X">
+                    <a-form-item name="product_id" label="产品X" :rules="[{ required: true, message: '请输入产品X' }]">
                         <a-select
                             v-model:value="addFormData.product_id"
+                            :disabled="isEdit"
                             :field-names="{ label: 'title', value: 'id' }"
                             :options="productDataX"
                             @change="changeOptions"
@@ -140,20 +141,20 @@
                     </a-form-item>
 
                     <!-- 折扣类型 -->
-                    <a-form-item name="area" label="折扣类型">
+                    <a-form-item label="折扣类型">
                         <a-select v-model:value="addFormData.discount_type" :options="valueData" />
                     </a-form-item>
 
-                    <div v-for="(i, index) in addFormData.y_products" :key="i" class="box_price">
+                    <div v-for="(i, index) in addFormData.y_products" :key="index" class="box_price">
                         <!-- Y 产品1 -->
-                        <a-form-item name="area" :label="`产品Y ${index + 1}`">
+                        <a-form-item :name="['y_products', index, 'product_id']" :label="`产品Y ${index + 1}`" :rules="[{ required: true,  message: `请输入产品Y${index + 1}` }]">
                             <a-select
-                                class="price_list"
-                                v-model:value="i.y_product_id"
-                                :field-names="{ label: 'title', value: 'id' }"
-                                :options="productDataX"
-                                @change="changeOptions"
-                            />
+                              class="price_list"
+                              v-model:value="i.product_id"
+                              :field-names="{ label: 'title', value: 'id' }"
+                              :options="productDataY"
+                              @change="changeOptions"
+                           />
                         </a-form-item>
 
                         <a-form-item name="area">
@@ -190,11 +191,17 @@ import {
     getProductAddList,
     // 管理端-设置X产品折扣商品 (新增的接口)
     getProductAddDiscountX,
+    createXDiscountProduct,
+    editXDiscountProduct,
     // 删除接口
     ProductDelDisableProductX,
 } from "@/api/statistics"
-import { ref, reactive, defineComponent, nextTick, watch } from "vue" // 弹出框
+import { ref, reactive, defineComponent, nextTick, watch, computed } from "vue" // 弹出框
 import { AxiosResponse } from "axios"
+import { message } from 'ant-design-vue';
+import type { FormInstance } from 'ant-design-vue';
+import { object } from "vue-types"
+import {useStore} from "vuex"
 
 interface FormState {
     product_id: number | null
@@ -213,9 +220,16 @@ export default defineComponent({
         const isShowAdd = ref(false)
         // 编辑的弹出框的 ref
         const myFormRefs = ref("")
+        const id = ref(0)
+        const spinning = ref(false)
+        const formRef = ref<FormInstance>();
         const tabData = ref([])
+        const isEdit  = ref(false)
+        let {state} = useStore();
+        let store = computed(() => state.user.store)
         // 产品 X 数据
         const productDataX = ref<array>([])
+        const productDataY = ref<array>([])
         // 新增添加按钮的数据
         const getProductListX = ref([])
         // 测试
@@ -231,8 +245,8 @@ export default defineComponent({
             is_active: true,
             y_products: [
                 {
-                    y_product_id: 1,
-                    discount_value: "20",
+                    product_id: null,
+                    discount_value: "0",
                 },
             ],
         })
@@ -241,39 +255,45 @@ export default defineComponent({
 
         // 产品 Y 的id
         const changeOptions = () => {
-            const arr = addFormData.y_products.map((item) => item.y_product_id)
-            arr.push(addFormData.product_id)
-            productDataX.value.forEach((element: { id: number; disabled: boolean }) => {
-                if (arr.includes(element.id)) {
-                    element.disabled = true
-                } else {
-                    element.disabled = false
-                }
-            })
+         const arr = addFormData.y_products.map((item) => item.product_id)
+         arr.push(addFormData.product_id)
+         productDataY.value.forEach((element: { id: any; disabled: boolean }) => {
+            element.disabled = false
+            if (arr.includes(element.id)) {
+               element.disabled = true
+            } else {
+               element.disabled = false
+            }
+         })
         }
-
-        // 拿到 新增按钮 数据源
-        const getProductAdd = () => {
-            getProductAddList("umys").then((res: AxiosResponse<any>) => {
-                productDataX.value = res
-                // productDataX.value = res.value.title
-                console.log(productDataX.value, "addFormData-----")
-            })
-        }
-        getProductAdd()
 
         // 新增按钮的 添加数据
         const getProductData = () => {
-            getProductList("umys").then((res: AxiosResponse<any>) => {
+            getProductList(store.value).then((res: AxiosResponse<any>) => {
                 getProductListX.value = res
                 // console.log(getProductListX.value, "-----")
             })
         }
         getProductData()
 
+         // 拿到 新增按钮 数据源
+         const getProductAdd = async () => {
+            await getProductAddList(store.value).then((res: AxiosResponse<any>) => {
+               productDataX.value = res
+               productDataY.value = res
+               productDataX.value.forEach((element: { id: number; disabled: boolean }) => {
+                  if (getProductListX.value.some(item => item.product_id === element.id)) {
+                     element.disabled = true
+                  } else {
+                     element.disabled = false
+                  }
+               })
+            })
+        }
+
         // 调用删除的接口
         const ProductDel = () => {
-            ProductDelDisableProductX("umys", { cs_x_product_id: x_product_id.value }).then(
+            return ProductDelDisableProductX(store.value, { cs_x_product_id: x_product_id.value }).then(
                 (res: AxiosResponse<any>) => {
                     console.log(res, "-----")
                 }
@@ -284,34 +304,76 @@ export default defineComponent({
         const delProduct = () => {
             isShowOut.value = false
             // 调用删除接口
-            ProductDel()
-            // 重新获取最新的数据
-            getProductData()
-            console.log(123)
+            ProductDel().then(() => {
+                message.success('删除成功！');
+            }).finally(() => {
+                // 重新获取最新的数据
+                getProductData()
+            }) 
         }
 
         // 头部的新增按钮
         const add = () => {
+            addFormData.product_id = null
+            addFormData.discount_type = 'percentage'
+            addFormData.y_products = [
+                {
+                    product_id: null,
+                    discount_value: "0",
+                },
+            ],
+            getProductAdd()
+            isEdit.value = false
             isShowAdd.value = true
         }
 
         // 新增按钮的提交
-        const addSubmit = () => {
-            getProductAddDiscountX("umys", addFormData)
+        const addSubmit = async () => {
+            try {
+                const values = await formRef.value.validateFields();
+                if (values) {
+                    spinning.value = true
+                    if(isEdit.value) {
+                        handleEditProduct()
+                    } else {
+                        handleCreateProdduct()
+                    }
+                }
+            } catch (errorInfo) {
+                console.log('Failed:', errorInfo);
+            }
+        }
+
+        const handleCreateProdduct = () => {
+            createXDiscountProduct(store.value, addFormData)
                 .then((res) => {
                     isShowAdd.value = false
+                    spinning.value = false
+                    message.success('新增成功！')
                     getProductData()
                 })
-                .finally(() => {
-                    loading.value = false
+        }
+
+        const handleEditProduct = () => {
+            const data = Object.assign({}, {
+                product_id: id.value,
+                discount_type: addFormData.discount_type,
+                y_products: addFormData.y_products,
+            })
+            editXDiscountProduct(store.value, data)
+                .then((res) => {
+                    isShowAdd.value = false
+                    spinning.value = false
+                    message.success('编辑成功！')
+                    getProductData()
                 })
         }
 
         // for 循环商品++
         const shoppingAdd = () => {
             addFormData.y_products.push({
-                y_product_id: 0,
-                discount_value: "20",
+               product_id: null,
+               discount_value: "0",
             })
             changeOptions()
         }
@@ -343,27 +405,30 @@ export default defineComponent({
         // 删除按钮弹出框
         const out = (productId: Number) => {
             x_product_id.value = productId
-            console.log(x_product_id.value, "888888888888888888888888")
-
             isShowOut.value = true
         }
 
         // 编辑按钮弹出框
-        const emitCommodityName = (record: object) => {
-            emitCommodityList.value = record
-            console.log(emitCommodityList.value, "record--record--record--record")
-            isShowEmit.value = true
+        const emitCommodityName = async (record: object) => {
+            console.log(record)
+            id.value = record.id
+            addFormData.product_id = record.product_id
+            addFormData.discount_type = record.discount_type
+            addFormData.y_products = record.y_products
+            await getProductAdd()
+            isEdit.value = true
+            isShowAdd.value = true
         }
 
         // 编辑表单的取消按钮
         const cancelOut = () => {
             isShowEmit.value = false
-            myFormRefs.value.resetFields()
+            // myFormRefs.value.resetFields()
         }
 
         // 编辑表单的右上角的 x
         const cancel = () => {
-            myFormRefs.value.resetFields()
+            // myFormRefs.value.resetFields()
         }
 
         // option 数据
@@ -410,30 +475,6 @@ export default defineComponent({
                 key: "action",
             },
         ]
-
-        // const tabData = [
-        //     {
-        //         key: "1",
-        //         name: "胡歌",
-        //         age: 18,
-        //         address: "中国",
-        //         variantId: "variant_id",
-        //     },
-        //     {
-        //         key: "2",
-        //         name: "易烊千玺",
-        //         age: 18,
-        //         address: "中国",
-        //         skuid: 23,
-        //     },
-        //     {
-        //         key: "3",
-        //         name: "谢老师",
-        //         age: 18,
-        //         address: "中国",
-        //         skuid: 23,
-        //     },
-        // ]
         return {
             crossData,
             tabData,
@@ -442,15 +483,19 @@ export default defineComponent({
             addFormData,
             emitFormData,
             myFormRefs,
+            formRef,
             isShowAdd,
             productDataX,
+            productDataY,
             changeOptions,
             addSubmit,
             getProductListX,
             ProductDel,
+            isEdit,
             delProduct,
             x_product_id,
             emitCommodityName,
+            handleCreateProdduct,
             emitCommodityList,
             shoppingReduce,
             shoppingAdd,

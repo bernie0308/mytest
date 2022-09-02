@@ -66,10 +66,28 @@ export function getProductList(store: string) {
     })
   }
 
+  // // 管理端-设置X产品折扣商品 (新增的接口) 
+  //  export function getProductAddDiscountX(store: string, data: Record<string, any> = {}) {
+  //   return request({
+  //     url: `/admin/cross-sell/${store}/set-x-discount-product`,
+  //     method: 'POST',
+  //     data
+  //   })
+  // }
+
   // 管理端-设置X产品折扣商品 (新增的接口) 
-   export function getProductAddDiscountX(store: string, data: Record<string, any> = {}) {
+  export function createXDiscountProduct(store: string, data: Record<string, any> = {}) {
     return request({
-      url: `/admin/cross-sell/${store}/set-x-discount-product`,
+      url: `/admin/cross-sell/${store}/create-x-discount-product`,
+      method: 'POST',
+      data
+    })
+  }
+
+  // 管理端-设置X产品折扣商品 (编辑的接口) 
+  export function editXDiscountProduct(store: string, data: Record<string, any> = {}) {
+    return request({
+      url: `/admin/cross-sell/${store}/edit-x-discount-product`,
       method: 'POST',
       data
     })
