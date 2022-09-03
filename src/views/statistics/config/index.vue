@@ -109,7 +109,7 @@
     </div>
 
     <!-- 新增的弹出层 -->
-    <div :spinning="spinning">
+    <div>
         <a-modal
             v-model:visible="isShowAdd"
             width="1000px"
@@ -117,6 +117,10 @@
             @cancel="cancel"
             @ok="addSubmit"
         >
+            <template #footer>
+                <a-button key="back" @click="cancel">取消</a-button>
+                <a-button key="submit" type="primary" :loading="spinning" @click="addSubmit">确定</a-button>
+            </template>
             <!-- 编辑弹出框里面的表单 -->
             <div class="box_select">
                 <a-form
@@ -492,6 +496,7 @@ export default defineComponent({
             getProductListX,
             ProductDel,
             isEdit,
+            spinning,
             delProduct,
             x_product_id,
             emitCommodityName,
